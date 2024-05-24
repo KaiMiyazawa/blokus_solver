@@ -6,10 +6,22 @@ import websockets
 class PlayerClient:
     def __init__(self, player_number: int, socket: websockets.WebSocketClientProtocol, loop: asyncio.AbstractEventLoop):
         self._loop = loop
+
+        #ソケット(出入り口)
+        #ここから入力し、ここに出力するイメージ。使い方の詳細はもともとのプログラム参照。もしくはドキュメント。
         self._socket = socket
+
+        # 先行の場合は1, 後攻の場合は2 ??
+        # 要確認。説明スライドではスライドではこう言ってただけ。
         self._player_number = player_number
+
+        # テストケースの手番。
+        #ランダムではなく、最初に置くべきマス(5,5) (A,A)を満たした良いテストケース。
         self.p1Actions = ['U034', 'B037', 'J266', 'M149', 'O763', 'R0A3', 'F0C6', 'K113', 'T021', 'L5D2', 'G251', 'E291', 'D057', 'A053']
         self.p2Actions = ['A0AA', 'B098', 'N0A5', 'L659', 'K33B', 'J027', 'E2B9', 'C267', 'U07C', 'M3AD', 'O2BB', 'R41C']
+
+        #お互いが何回打ったかをカウントしている変数。
+        #仕様として残す必要もないが、考え方としては重要なので理解しておくべき
         self.p1turn = 0
         self.p2turn = 0
 
@@ -29,24 +41,61 @@ class PlayerClient:
                 raise SystemExit
 
     def create_action(self, board):
-        actions: list[str]
-        turn: int
 
-        if self.player_number == 1:
-            actions = self.p1Actions
-            turn = self.p1turn
-            self.p1turn += 1
-        else:
-            actions = self.p2Actions
-            turn = self.p2turn
-            self.p2turn += 1
+        #福原さんと滝野さんに考えて欲しい関数
+        def get_next_grid(board):
+            p_num = self._player_number
+            #置くことができるマスを、何らかの文字で埋める。
+            #(数字とA~Eと.oxの三文字以外が望ましい。空白ももちろんやめて欲しい。)
 
-        if len(actions) > turn:
-            return actions[turn]
-        else:
-            # パスを選択
-            return 'X000'
-    
+            #以降を作ってください。
+            next_board = board
+
+            return next_board
+
+
+
+        next_grid = get_next_grid(board)
+
+        #反則を無視して可能な手を全列挙するフェーズ
+        #反則の手を潰すフェーズ
+        #以降、OKケースの中からヒューリスティックに良い手を探索。以下は現状上がってる選別法
+            #相手が置けるマスをより多く潰す手を選ぶ
+            #選ぶピースの大きさが大きいものを優先する
+            #次の自分のターンで、置けるようになるマスの多さ　＝　置くピースの角の多さ
+                #相手のピースの位置も見て、その角が有効かどうかの判定もあるとなおよし
+
+        #選別を経て複数の手が残った場合は、ヤケクソのランダム
+
+
+        #適当です。
+        #readmeのテストが動いて、反則負けできるようにしてあります。
+        return 'U034'
+
+
+
+
+
+        #以下、もともとのcreate_action内部
+    #def create_action(self, board):
+    #    actions: list[str]
+    #    turn: int
+
+    #    if self.player_number == 1:
+    #        actions = self.p1Actions
+    #        turn = self.p1turn
+    #        self.p1turn += 1
+    #    else:
+    #        actions = self.p2Actions
+    #        turn = self.p2turn
+    #        self.p2turn += 1
+
+    #    if len(actions) > turn:
+    #        return actions[turn]
+    #    else:
+    #        # パスを選択
+    #        return 'X000'
+
     @staticmethod
     async def create(url: str, loop: asyncio.AbstractEventLoop) -> PlayerClient:
         socket = await websockets.connect(url)
