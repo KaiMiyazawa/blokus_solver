@@ -468,7 +468,7 @@ class PlayerClient:
                                 piece_map_origin = BlockType(piece)
                                 piece_map = piece_map_origin.block_map
                                 if rf % 2 == 1:
-                                    piece_map = np.flipud(piece_map)
+                                    piece_map = np.fliplr(piece_map)
                                 if rf == 0 or rf == 1:
                                     pass
                                 elif rf == 2 or rf == 3:
