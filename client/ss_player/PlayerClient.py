@@ -2,6 +2,13 @@ from __future__ import annotations
 import asyncio
 import websockets
 
+from enum import Enum
+from typing import Any
+
+import numpy as np
+
+import random
+
 
 class PlayerClient:
     def __init__(self, player_number: int, socket: websockets.WebSocketClientProtocol, loop: asyncio.AbstractEventLoop):
@@ -25,6 +32,9 @@ class PlayerClient:
         self.p1turn = 0
         self.p2turn = 0
 
+        self.my_hands = [chr(ord("A")+i) for i in range(21)]
+        self.ene_hands = [chr(ord("A")+i) for i in range(21)]
+
     @property
     def player_number(self) -> int:
         return self._player_number
@@ -41,36 +51,454 @@ class PlayerClient:
                 raise SystemExit
 
     def create_action(self, board):
+        #ピースの形状を定義するクラス ==========================done
+        class BlockType(Enum):
+            A = 'A'
+            B = 'B'
+            C = 'C'
+            D = 'D'
+            E = 'E'
+            F = 'F'
+            G = 'G'
+            H = 'H'
+            I = 'I'
+            J = 'J'
+            K = 'K'
+            L = 'L'
+            M = 'M'
+            N = 'N'
+            O = 'O'
+            P = 'P'
+            Q = 'Q'
+            R = 'R'
+            S = 'S'
+            T = 'T'
+            U = 'U'
+            X = 'X'
 
-        #福原さんと滝野さんに考えて欲しい関数
-        def get_next_grid(board):
-            p_num = self._player_number
-            #置くことができるマスを、何らかの文字で埋める。
-            #(数字とA~Eと.oxの三文字以外が望ましい。空白ももちろんやめて欲しい。)
+            @property
+            def block_map(self) -> np.ndarray[Any, np.dtype[int]]:
+                if self == BlockType.A:
+                    '''
+                    type A:
+                    ■
+                    '''
+                    return np.array([[1]])
+                elif self == BlockType.B:
+                    '''
+                    type B:
+                    ■
+                    ■
+                    '''
+                    return np.array([[1], [1]])
+                elif self == BlockType.C:
+                    '''
+                    type C:
+                    ■
+                    ■
+                    ■
+                    '''
+                    return np.array([[1], [1], [1]])
+                elif self == BlockType.D:
+                    '''
+                    type D:
+                    ■
+                    ■ ■
+                    '''
+                    return np.array([[1, 0], [1, 1]])
+                elif self == BlockType.E:
+                    '''
+                    type E:
+                    ■
+                    ■
+                    ■
+                    ■
+                    '''
+                    return np.array([[1], [1], [1], [1]])
+                elif self == BlockType.F:
+                    '''
+                    type F:
+                    ■
+                    ■
+                    ■ ■
+                    '''
+                    return np.array([[0, 1], [0, 1], [1, 1]])
+                elif self == BlockType.G:
+                    '''
+                    type G:
+                    ■
+                    ■ ■
+                    ■
+                    '''
+                    return np.array([[1, 0], [1, 1], [1, 0]])
+                elif self == BlockType.H:
+                    '''
+                    type H:
+                    ■ ■
+                    ■ ■
+                    '''
+                    return np.array([[1, 1], [1, 1]])
+                elif self == BlockType.I:
+                    '''
+                    type I:
+                    ■ ■
+                    ■ ■
+                    '''
+                    return np.array([[1, 1, 0], [0, 1, 1]])
+                elif self == BlockType.J:
+                    '''
+                    type J:
+                    ■
+                    ■
+                    ■
+                    ■
+                    ■
+                    '''
+                    return np.array([[1], [1], [1], [1], [1]])
+                elif self == BlockType.K:
+                    '''
+                    type K:
+                    ■
+                    ■
+                    ■
+                    ■ ■
+                    '''
+                    return np.array([[0, 1], [0, 1], [0, 1], [1, 1]])
+                elif self == BlockType.L:
+                    '''
+                    type L:
+                    ■
+                    ■
+                    ■ ■
+                    ■
+                    '''
+                    return np.array([[0, 1], [0, 1], [1, 1], [1, 0]])
+                elif self == BlockType.M:
+                    '''
+                    type M:
+                    ■
+                    ■ ■
+                    ■ ■
+                    '''
+                    return np.array([[0, 1], [1, 1], [1, 1]])
+                elif self == BlockType.N:
+                    '''
+                    type N:
+                    ■ ■
+                    ■
+                    ■ ■
+                    '''
+                    return np.array([[1, 1], [0, 1], [1, 1]])
+                elif self == BlockType.O:
+                    '''
+                    type O:
+                    ■
+                    ■ ■
+                    ■
+                    ■
+                    '''
+                    return np.array([[1, 0], [1, 1], [1, 0], [1, 0]])
+                elif self == BlockType.P:
+                    '''
+                    type P:
+                    ■
+                    ■
+                    ■ ■ ■
+                    '''
+                    return np.array([[0, 1, 0], [0, 1, 0], [1, 1, 1]])
+                elif self == BlockType.Q:
+                    '''
+                    type Q:
+                    ■
+                    ■
+                    ■ ■ ■
+                    '''
+                    return np.array([[1, 0, 0], [1, 0, 0], [1, 1, 1]])
+                elif self == BlockType.R:
+                    '''
+                    type R:
+                    ■ ■
+                    ■ ■
+                        ■
+                    '''
+                    return np.array([[1, 1, 0], [0, 1, 1], [0, 0, 1]])
+                elif self == BlockType.S:
+                    '''
+                    type S:
+                    ■
+                    ■ ■ ■
+                        ■
+                    '''
+                    return np.array([[1, 0, 0], [1, 1, 1], [0, 0, 1]])
+                elif self == BlockType.T:
+                    '''
+                    type T:
+                    ■
+                    ■ ■ ■
+                    ■
+                    '''
+                    return np.array([[1, 0, 0], [1, 1, 1], [0, 1, 0]])
+                elif self == BlockType.U:
+                    '''
+                    type U:
+                    ■
+                    ■ ■ ■
+                    ■
+                    '''
+                    return np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
+                elif self == BlockType.X:
+                    '''
+                    type X:パスをする時用
 
-            #以降を作ってください。
-            next_board = board
-
-            return next_board
 
 
+                    '''
+                    return np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 
-        next_grid = get_next_grid(board)
+                else:
+                    raise NotImplementedError
+        # ========================================================
+
+        # もらった盤面に、次打てるマスを追加して返す関数 ==================done
+        def __get_start_grid(matrix, player):
+            if player == 1:
+                matrix[4][4] = 'y'
+            else:
+                matrix[9][9] = 'z'
+            return matrix
+
+        def get_next_grid(matrix, player):
+            # 最初の置く位置の指定
+            if (self.p1turn == 0 and player == 1):
+                self.p1turn += 1
+                return (__get_start_grid(matrix, player=1))
+            elif self.p2turn == 0 and player == 2 :
+                self.p2turn += 1
+                return (__get_start_grid(matrix, player=2))
+
+            if player == 1:
+                block = 'o'
+                p = 'y'
+            else:
+                block = 'x'
+                p = 'z'
+
+            rows = len(matrix)
+            cols = len(matrix[0])
+
+            # 新しい行列を作成
+            new_matrix = [row[:] for row in matrix]
+
+            # ブロックの位置を記録するリスト
+            block_positions = []
+
+            # ブロックの位置を探して記録
+            for r in range(rows):
+                for c in range(cols):
+                    if matrix[r][c] == block:
+                        block_positions.append((r, c))
+
+            # 'block' の位置を基に対角線上の位置を 'p' に置き換え
+            for r, c in block_positions:
+                # 右上の座標 (r-1, c+1)
+                if r > 0 and c < cols - 1:
+                    if matrix[r-1][c] != block and matrix[r][c+1] != block and matrix[r-1][c+2] != block and matrix[r-2][c+1] != block and matrix[r-1][c+1] == '.':
+                        new_matrix[r-1][c+1] = p
+                # 右下の座標 (r+1, c+1)
+                if r < rows - 1 and c < cols - 1:
+                    if matrix[r+1][c] != block and matrix[r][c+1] != block and matrix[r+1][c+2] != block and matrix[r+2][c+1] != block and matrix[r+1][c+1] == '.':
+                        new_matrix[r+1][c+1] = p
+                # 左下の座標 (r+1, c-1)
+                if r < rows - 1 and c > 0:
+                    if matrix[r+1][c] != block and matrix[r][c-1] != block and matrix[r+1][c-2] != block and matrix[r+2][c-1] != block and matrix[r+1][c-1] == '.':
+                        new_matrix[r+1][c-1] = p
+                # 左上の座標 (r-1, c-1)
+                if r > 0 and c > 0:
+                    if matrix[r-1][c] != block and matrix[r][c-1] != block and matrix[r-1][c-2] != block and matrix[r-2][c-1] != block and matrix[r-1][c-1] == '.':
+                        new_matrix[r-1][c-1] = p
+
+            return new_matrix
+        # ===============================================
+
+        # もらった盤面を2次元配列に変換する ==================done
+        def make_matrix(board):
+            l = 0
+            new = ""
+            for char in board:
+                if char in ('.', 'o', 'x', '\n'):
+                    new += str(char)
+            if new.startswith('\n'):
+                new = new[1:]
+            if new.endswith('\n'):
+                new = new[:-1]
+            board_list = new.split(sep = '\n')
+            board_matrix = [[char for char in string] for string in board_list]
+            return board_matrix
+        # ===============================================
+
+        # 反則でない手を全列挙する関数 ===============================
+        # 長いので階層構造に注意して読んでください。
+        def get_ok_cases(next_grid) -> list[str]:
+            #置けるますに対して、置ける手を全列挙する。
+            #反則でないもののみをlistにappendしていく。
+            #そのリストを返す。
+
+            # 反則判定の関数 ========================================
+            # 完全に反則でない手の場合のみ、Trueを返す関数
+            # もちろん、反則はFalseを返す。
+            def is_ok(next_grid, piece:str, rf:int, i, j) -> bool:
+
+                # ===== ピースの重なり判定=========================
+                # y or z なのは、next_grid[i][j]。
+                # y or z と piece_map[a][b] が重なるかどうかを判定する。
+                # 要は、
+                # piece_map[0][0] は、next_grid[i-a][j-b] と重なるように置かれる。
+                # この時、piece_mapの中で1が立っているマスについて、
+                # すでに置かれているマスと重なるように置かれていないかどうかを判定する。
+                def is_dup(next_grid, piece_map, i, j, a, b) -> bool:
+                    for p in range(piece_map.shape[0]):
+                        for q in range(piece_map.shape[1]):
+                            if piece_map[p][q] == 1:
+                                if next_grid[i-a+p][j-b+q] == 'o' or next_grid[i-a+p][j-b+q] == 'x':
+                                    return True
+
+                # ===============================================
+
+                # ===== ピースの盤面外判定 ========================yet
+                def is_out() -> bool:
+                    pass
+                # ===============================================
+
+
+                # ===== ピースの隣接判定 ==========================yet
+                def is_neighbor() -> bool:
+                    pass
+                # ===============================================
+
+
+                # 以下、この関数のフロー============================
+                #反転、回転を含めた、ピースの形状を獲得
+                piece_map_origin = BlockType(piece)
+                piece_map = piece_map_origin.block_map
+                if rf % 2 == 0:
+                    piece_map = np.flipud(piece_map)
+                if rf == 1 or rf == 2:
+                    pass
+                elif rf == 3 or rf == 4:
+                    piece_map = np.rot90(piece_map, 3)
+                elif rf == 5 or rf == 6:
+                    piece_map = np.rot90(piece_map, 2)
+                elif rf == 7 or rf == 8:
+                    piece_map = np.rot90(piece_map, 1)
+
+                #ピースの各マスについて、y or zに重ねて置いた時、反則でないかどうかを判定する。
+                for a in range(piece_map.shape[0]):
+                    for b in range(piece_map.shape[1]):
+                        if piece_map[a][b] == 1:
+                            # 最初に盤面外判定をしておかないと、他の場面で安心して検証ができない。
+                            # next_grid をインデックスアウトしないようにするために。
+                            if is_out(): #盤面外判定 = 置こうとしているマス ひとつづつについて、盤面外に出ていないかどうか
+                                return False
+                            if is_dup(next_grid, piece_map, i, j, a, b): #重複判定 = すでに置かれているマスと重なるようにおこうとしてしまっているかどうか
+                                # 敵のピースでも自分のピースでも、重なってはいけないべき であることに注意
+                                return False
+                            if is_neighbor(): #隣接判定 = すでに置かれている　”自分の” ピースと隣接してしまっているかどうか
+                                return False
+
+
+                return True
+                # ===============================================
+
+            # 情報から、手の文字列を生成する関数 =======================yet
+            # i, j と、本当に報告すべき座標は異なる。計算が必要。
+            def get_ok_string(piece:str, rf:int, i, j) -> str:
+                # rf = rotate & flip
+                # i, j = position
+                if i+1 < 10:
+                    I = str(i+1)
+                else:
+                    I = chr(ord("A")+i-9)
+                if j+1 < 10:
+                    J = str(j+1)
+                else:
+                    J = chr(ord("A")+j-9)
+                print("piece: ", piece)
+                print("rf: ", rf)
+                print("i: ", i)
+                print("j: ", j)
+                return (piece + str(rf) + I[0] + J[0])
+
+            # =====================================================
+
+            ok_cases = []
+
+            for i in range(14):
+                for j in range(14):
+                    cell = next_grid[i][j]
+                    #一つずつマスを見ていく
+                    #もし置けるマスであれば、そのマスに対して全ての手を試す
+                    if cell == "y" or cell == "z":
+                        for piece in self.my_hands:
+                            for rf in range(8): # rotate & flip
+                                if is_ok(next_grid, piece, rf, i, j):
+                                    ok_cases.append(get_ok_string(piece, rf, int(i), int(j)))
+                            #置けるかどうかの判定
+                            #置ける場合は、その手をリストに追加
+
+            return ok_cases
+
+        # ===============================================
+
+
+        # ヒューリスティックに良い手を選ぶ関数 ==================yet
+        def dicide_hand(ok_cases) -> str:
+            id = random.randrange(len(ok_cases))
+            return ok_cases[id]
+
+
+        # 以下、==========================================
+        # 処理のフロー ====================================
+
+        # 文字列から2次元配列に変換する
+        board_matrix = make_matrix(board)
+
+        # 自分が置ける起点となるマスにマークを加えた配列を作成する
+        next_grid = get_next_grid(board_matrix, player = self.player_number)
 
         #反則を無視して可能な手を全列挙するフェーズ
         #反則の手を潰すフェーズ
+        #ふたつまとめてget_ok_cases
+        ok_cases = get_ok_cases(next_grid)
+        # ok_cases == 反則ではない手のリスト
+        # ["A000", "A004", ........ "U0DD"] みたいな感じ
+
+        #反則を無視して可能な手がない場合は、パスの手(X000)を返す
+        if len(ok_cases) == 0:
+            self.p1turn += 1
+            self.p2turn += 1
+            return 'X000'
+
+        # ここからヒューリスティックに良い手を選ぶ
         #以降、OKケースの中からヒューリスティックに良い手を探索。以下は現状上がってる選別法
             #相手が置けるマスをより多く潰す手を選ぶ
             #選ぶピースの大きさが大きいものを優先する
             #次の自分のターンで、置けるようになるマスの多さ　＝　置くピースの角の多さ
                 #相手のピースの位置も見て、その角が有効かどうかの判定もあるとなおよし
+            # 選別を経て複数の手が残った場合は、ヤケクソのランダム
+        #返り値は、単一の文字列が好ましいと思われる。多分。
+        this_turn_hand = dicide_hand(ok_cases)
+        print("this_turn_hand: ", this_turn_hand)
 
-        #選別を経て複数の手が残った場合は、ヤケクソのランダム
+        #選択した手を手札から削除
+        self.my_hands.remove(this_turn_hand[0])
 
+        #次の手番に備えて、手番を進める
+        self.p1turn += 1
+        self.p2turn += 1
 
         #適当です。
         #readmeのテストが動いて、反則負けできるようにしてあります。
-        return 'U034'
+        return this_turn_hand
 
 
 
