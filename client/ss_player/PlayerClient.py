@@ -362,9 +362,14 @@ class PlayerClient:
 
                 # ===============================================
 
-                # ===== ピースの盤面外判定 ========================yet
-                def is_out() -> bool:
-                    pass
+                # ===== ピースの盤面外判定 ========================
+                # TODO: 未test
+                def is_out(next_grid, piece_map, i, j, a, b) -> bool:
+                    for p in range(piece_map.shape[0]):
+                        for q in range(piece_map.shape[1]):
+                            if piece_map[p][q] == 1:
+                                if i-a+p < 0 or i-a+p > 13 or j-b+q < 0 or j-b+q > 13:
+                                    return True
                 # ===============================================
 
 
