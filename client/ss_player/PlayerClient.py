@@ -260,19 +260,19 @@ class PlayerClient:
         # ========================================================
 
         # もらった盤面に、次打てるマスを追加して返す関数 ==================done
-        def __get_start_grid(matrix, player):
+        def __get_start_grid(self, matrix, player):
             if player == 1:
                 matrix[4][4] = 'y'
             else:
                 matrix[9][9] = 'z'
             return matrix
 
-        def get_next_grid(matrix, player):
+        def get_next_grid(self, matrix, player):
             # 最初の置く位置の指定
             if (self.p1turn == 0 and player == 1):
-                return (__get_start_grid(matrix, player=1))
+                return (self.__get_start_grid(matrix, player=1))
             elif self.p2turn == 0 and player == 2 :
-                return (__get_start_grid(matrix, player=2))
+                return (self.__get_start_grid(matrix, player=2))
 
             if player == 1:
                 block = 'o'
@@ -319,7 +319,7 @@ class PlayerClient:
         # ===============================================
 
         # もらった盤面を2次元配列に変換する ==================done
-        def make_matrix(board):
+        def make_matrix(self, board):
             l = 0
             new = ""
             for char in board:
@@ -458,10 +458,10 @@ class PlayerClient:
         # 処理のフロー ====================================
 
         # 文字列から2次元配列に変換する
-        board_matrix = make_matrix(board)
+        board_matrix = self.make_matrix(board)
 
         # 自分が置ける起点となるマスにマークを加えた配列を作成する
-        next_grid = get_next_grid(board_matrix, player = self.player_number)
+        next_grid = self.get_next_grid(board_matrix, player = self.player_number)
 
         #反則を無視して可能な手を全列挙するフェーズ
         #反則の手を潰すフェーズ
