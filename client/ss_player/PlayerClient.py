@@ -370,18 +370,52 @@ class PlayerClient:
                 # TODO: 未test
                 # TODO: 未test
                 def is_neighbor(next_grid, piece_map, i, j, a, b) -> bool:
+                    if self.player_number == 1:
+                        block = 'o'
+                    else:
+                        block = 'x'
+
+                    grid_size = len(next_grid)
                     for p in range(piece_map.shape[0]):
                         for q in range(piece_map.shape[1]):
                             if piece_map[p][q] == 1:
-                                r = i-a+p
-                                c = j-b+q
+                                r = i - a + p
+                                c = j - b + q
 
-                                if r-1 < 0 or r+1 > 13 or c-1 < 0 or c+1 > 13:
+                                # Skip if r or c is out of the grid bounds
+                                if r < 0 or r >= grid_size or c < 0 or c >= grid_size:
                                     continue
-                                # FIXME: プレイヤーナンバーごとに隣接チェック対象の文字を変える
-                                block = 'o' if self._player_number == 1 else 'x'
-                                if (next_grid[r-1][c] == block or next_grid[r][c+1] == block or next_grid[r+1][c] == block or next_grid[r][c-1] == block):
-                                    return True
+
+                                # Check corners and edges separately
+                                if r == 0 and c == 0:
+                                    if next_grid[r+1][c] == block or next_grid[r][c+1] == block:
+                                        return True
+                                elif r == 0 and c == grid_size - 1:
+                                    if next_grid[r+1][c] == block or next_grid[r][c-1] == block:
+                                        return True
+                                elif r == grid_size - 1 and c == 0:
+                                    if next_grid[r-1][c] == block or next_grid[r][c+1] == block:
+                                        return True
+                                elif r == grid_size - 1 and c == grid_size - 1:
+                                    if next_grid[r-1][c] == block or next_grid[r][c-1] == block:
+                                        return True
+                                elif r == 0:
+                                    if next_grid[r][c+1] == block or next_grid[r+1][c] == block or next_grid[r][c-1] == block:
+                                        return True
+                                elif r == grid_size - 1:
+                                    if next_grid[r-1][c] == block or next_grid[r][c+1] == block or next_grid[r][c-1] == block:
+                                        return True
+                                elif c == 0:
+                                    if next_grid[r-1][c] == block or next_grid[r][c+1] == block or next_grid[r+1][c] == block:
+                                        return True
+                                elif c == grid_size - 1:
+                                    if next_grid[r-1][c] == block or next_grid[r+1][c] == block or next_grid[r][c-1] == block:
+                                        return True
+                                else:
+                                    if next_grid[r-1][c] == block or next_grid[r][c+1] == block or next_grid[r+1][c] == block or next_grid[r][c-1] == block:
+                                        return True
+
+                    return False
                 # ===============================================
 
         # 以下、この関数のフロー
@@ -463,12 +497,11 @@ class PlayerClient:
                     #一つずつマスを見ていく
                     #もし置けるマスであれば、そのマスに対して全ての手を試す
                     if is_corner(i, j) or (self._player_number == 1 and self.p1turn == 0 and i == 4 and j == 4) or (self._player_number == 2 and self.p2turn == 0 and i == 9 and j == 9):
+                        #print("p2.turn, ", self.p2turn, "i, ", i, "j, ", j)
                         for piece in self.my_hands:
                             for rf in range(8): # rotate & flip
                                 piece_map_origin = BlockType(piece)
                                 piece_map = piece_map_origin.block_map
-                                if rf % 2 == 1:
-                                    piece_map = np.flipud(piece_map)
                                 if rf == 0 or rf == 1:
                                     pass
                                 elif rf == 2 or rf == 3:
@@ -477,6 +510,8 @@ class PlayerClient:
                                     piece_map = np.rot90(piece_map, 2).copy()
                                 elif rf == 6 or rf == 7:
                                     piece_map = np.rot90(piece_map, 1).copy()
+                                if rf % 2 == 1:
+                                    piece_map = np.fliplr(piece_map)
                                 #print(piece, rf)
                                 #tmp = piece_map_origin.block_map
                                 #for row in tmp:
