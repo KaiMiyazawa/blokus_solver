@@ -676,7 +676,42 @@ class PlayerClient:
 
         # TODO: ピースの大きさを優先する
         def big_piece(better_cases) -> str:
-            return better_cases
+            better_cases_w_size = {}
+
+            for cs in ok_cases:
+                # NOTE: pieceを正しい向きで取得する
+                piece = str(cs[0])
+                rf = int(cs[1])
+                if cs[2] in ['A', 'B', 'C', 'D', 'E']:
+                    j = ord(cs[2]) - 55 - 1
+                else:
+                    j = int(cs[2]) - 1
+                if cs[3] in ['A', 'B', 'C', 'D', 'E']:
+                    i = ord(cs[3]) - 55 - 1
+                else:
+                    i = int(cs[3]) - 1
+                piece_map_origin = BlockType(piece)
+                piece_map = piece_map_origin.block_map
+                if rf == 0 or rf == 1:
+                    pass
+                elif rf == 2 or rf == 3:
+                    piece_map = np.rot90(piece_map, 3).copy()
+                elif rf == 4 or rf == 5:
+                    piece_map = np.rot90(piece_map, 2).copy()
+                elif rf == 6 or rf == 7:
+                    piece_map = np.rot90(piece_map, 1).copy()
+                if rf % 2 == 1:
+                    piece_map = np.fliplr(piece_map)
+                size_count = 0
+                for p in range(piece_map.shape[0]):
+                    for q in range(piece_map.shape[1]):
+                        if piece_map[p][q] == 1:
+                            size_count += 1
+                better_cases_w_size[cs] = size_count
+            max_value = max(better_cases_w_size.values())
+
+            # 最大値を持つキーのリストを作成する
+            return [k for k, v in better_cases_w_size.items() if v == max_value]
 
         # TODO: 次に置ける角の数を優先
         def more_corner_piece(better_cases) -> str:
