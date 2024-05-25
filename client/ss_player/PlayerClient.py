@@ -388,7 +388,6 @@ class PlayerClient:
 									):
                                     return True
                 # ===============================================
-
                 # 最初に盤面外判定をしておかないと、他の場面で安心して検証ができない。
                 # next_grid をインデックスアウトしないようにするために。
                 if is_out(next_grid, piece_map, i, j, a, b): #盤面外判定 = 置こうとしているマス ひとつづつについて、盤面外に出ていないかどうか
@@ -398,6 +397,36 @@ class PlayerClient:
                     return False
                 if is_neighbor(next_grid, piece_map, i, j, a, b): #隣接判定 = すでに置かれている　”自分の” ピースと隣接してしまっているかどうか
                     return False
+
+                # 以下、この関数のフロー============================
+                #反転、回転を含めた、ピースの形状を獲得
+                piece_map_origin = BlockType(piece)
+                piece_map = piece_map_origin.block_map
+                if rf % 2 == 0:
+                    piece_map = np.flipud(piece_map)
+                if rf == 1 or rf == 2:
+                    pass
+                elif rf == 3 or rf == 4:
+                    piece_map = np.rot90(piece_map, 3)
+                elif rf == 5 or rf == 6:
+                    piece_map = np.rot90(piece_map, 2)
+                elif rf == 7 or rf == 8:
+                    piece_map = np.rot90(piece_map, 1)
+
+                #ピースの各マスについて、y or zに重ねて置いた時、反則でないかどうかを判定する。
+                for a in range(piece_map.shape[0]):
+                    for b in range(piece_map.shape[1]):
+                        if piece_map[a][b] == 1:
+                            # 最初に盤面外判定をしておかないと、他の場面で安心して検証ができない。
+                            # next_grid をインデックスアウトしないようにするために。
+                            if is_out(next_grid, piece_map, i, j, a, b): #盤面外判定 = 置こうとしているマス ひとつづつについて、盤面外に出ていないかどうか
+                                return False
+                            if is_dup(next_grid, piece_map, i, j, a, b): #重複判定 = すでに置かれているマスと重なるようにおこうとしてしまっているかどうか
+                                # 敵のピースでも自分のピースでも、重なってはいけないべき であることに注意
+                                return False
+                            if is_neighbor(next_grid, piece_map, i, j, a, b): #隣接判定 = すでに置かれている　”自分の” ピースと隣接してしまっているかどうか
+                                return False
+
                 return True
                 # ===============================================
 
