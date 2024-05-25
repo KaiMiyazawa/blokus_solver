@@ -235,7 +235,7 @@ class PlayerClient:
                     type T:
                     ■
                     ■ ■ ■
-                    ■
+                      ■
                     '''
                     return np.array([[1, 0, 0], [1, 1, 1], [0, 1, 0]])
                 elif self == BlockType.U:
@@ -381,9 +381,12 @@ class PlayerClient:
                             if piece_map[p][q] == 1:
                                 r = i-a+p
                                 c = j-b+q
+
+                                if r-1 < 0 or r+1 > 13 or c-1 < 0 or c+1 > 13:
+                                    continue
                                 # FIXME: プレイヤーナンバーごとに隣接チェック対象の文字を変える
                                 block = 'o' if self.player_number == 1 else 'x'
-                                if (next_grid[r-1][c] == block and next_grid[r][c+1] == block and next_grid[r+1][c] == block and next_grid[r][c-1] == block):
+                                if (next_grid[r-1][c] == block or next_grid[r][c+1] == block or next_grid[r+1][c] == block or next_grid[r][c-1] == block):
                                     return True
                 # ===============================================
 
@@ -404,7 +407,13 @@ class PlayerClient:
             # 情報から、手の文字列を生成する関数 =======================yet
             # i, j と、本当に報告すべき座標は異なる。計算が必要。
             def get_ok_string(piece, rf, i, j, a, b) -> str:
-                return (piece + str(rf) + str(i-a) + str(j-b))
+                I = j-b+1
+                J = i-a+1
+                if I >= 10:
+                    I = chr(ord('A') + I - 10)
+                if J >= 10:
+                    J = chr(ord('A') + J - 10)
+                return (piece + str(rf) + str(I) + str(J))
 
             # =====================================================
 
@@ -420,17 +429,23 @@ class PlayerClient:
                             for rf in range(8): # rotate & flip
                                 piece_map_origin = BlockType(piece)
                                 piece_map = piece_map_origin.block_map
-                                if rf % 2 == 0:
+                                if rf % 2 == 1:
                                     piece_map = np.flipud(piece_map)
-                                if rf == 1 or rf == 2:
+                                if rf == 0 or rf == 1:
                                     pass
-                                elif rf == 3 or rf == 4:
-                                    piece_map = np.rot90(piece_map, 3)
-                                elif rf == 5 or rf == 6:
-                                    piece_map = np.rot90(piece_map, 2)
-                                elif rf == 7 or rf == 8:
-                                    piece_map = np.rot90(piece_map, 1)
-
+                                elif rf == 2 or rf == 3:
+                                    piece_map = np.rot90(piece_map, 3).copy()
+                                elif rf == 4 or rf == 5:
+                                    piece_map = np.rot90(piece_map, 2).copy()
+                                elif rf == 6 or rf == 7:
+                                    piece_map = np.rot90(piece_map, 1).copy()
+                                #print(piece, rf)
+                                #tmp = piece_map_origin.block_map
+                                #for row in tmp:
+                                #    print(row)
+                                #print("=====")
+                                #for row in piece_map:
+                                #    print(row)
                                 #ピースの各マスについて、y or zに重ねて置いた時、反則でないかどうかを判定する。
                                 for a in range(piece_map.shape[0]):
                                     for b in range(piece_map.shape[1]):
