@@ -82,6 +82,7 @@ class PlayerClient:
                     '''
                     type A:
                     ■
+                    corner:4
                     '''
                     return np.array([[1]])
                 elif self == BlockType.B:
@@ -89,6 +90,7 @@ class PlayerClient:
                     type B:
                     ■
                     ■
+                    corner: 4
                     '''
                     return np.array([[1], [1]])
                 elif self == BlockType.C:
@@ -97,6 +99,7 @@ class PlayerClient:
                     ■
                     ■
                     ■
+                    corner: 4
                     '''
                     return np.array([[1], [1], [1]])
                 elif self == BlockType.D:
@@ -104,6 +107,7 @@ class PlayerClient:
                     type D:
                     ■
                     ■ ■
+                    corner: 5
                     '''
                     return np.array([[1, 0], [1, 1]])
                 elif self == BlockType.E:
@@ -113,6 +117,7 @@ class PlayerClient:
                     ■
                     ■
                     ■
+                    corner: 4
                     '''
                     return np.array([[1], [1], [1], [1]])
                 elif self == BlockType.F:
@@ -121,6 +126,7 @@ class PlayerClient:
                       ■
                       ■
                     ■ ■
+                    corner: 5
                     '''
                     return np.array([[0, 1], [0, 1], [1, 1]])
                 elif self == BlockType.G:
@@ -129,6 +135,7 @@ class PlayerClient:
                     ■
                     ■ ■
                     ■
+                    corner: 6
                     '''
                     return np.array([[1, 0], [1, 1], [1, 0]])
                 elif self == BlockType.H:
@@ -136,6 +143,7 @@ class PlayerClient:
                     type H:
                     ■ ■
                     ■ ■
+                    corner: 4
                     '''
                     return np.array([[1, 1], [1, 1]])
                 elif self == BlockType.I:
@@ -143,6 +151,7 @@ class PlayerClient:
                     type I:
                     ■ ■
                       ■ ■
+                    corner: 6
                     '''
                     return np.array([[1, 1, 0], [0, 1, 1]])
                 elif self == BlockType.J:
@@ -153,6 +162,7 @@ class PlayerClient:
                     ■
                     ■
                     ■
+                    corner: 4
                     '''
                     return np.array([[1], [1], [1], [1], [1]])
                 elif self == BlockType.K:
@@ -162,6 +172,7 @@ class PlayerClient:
                       ■
                       ■
                     ■ ■
+                    corner: 5
                     '''
                     return np.array([[0, 1], [0, 1], [0, 1], [1, 1]])
                 elif self == BlockType.L:
@@ -171,6 +182,7 @@ class PlayerClient:
                       ■
                     ■ ■
                     ■
+                    corner: 6
                     '''
                     return np.array([[0, 1], [0, 1], [1, 1], [1, 0]])
                 elif self == BlockType.M:
@@ -179,6 +191,7 @@ class PlayerClient:
                       ■
                     ■ ■
                     ■ ■
+                    corner: 5
                     '''
                     return np.array([[0, 1], [1, 1], [1, 1]])
                 elif self == BlockType.N:
@@ -187,6 +200,7 @@ class PlayerClient:
                     ■ ■
                       ■
                     ■ ■
+
                     '''
                     return np.array([[1, 1], [0, 1], [1, 1]])
                 elif self == BlockType.O:
@@ -196,6 +210,7 @@ class PlayerClient:
                     ■ ■
                     ■
                     ■
+                    corner: 6
                     '''
                     return np.array([[1, 0], [1, 1], [1, 0], [1, 0]])
                 elif self == BlockType.P:
@@ -204,6 +219,7 @@ class PlayerClient:
                       ■
                       ■
                     ■ ■ ■
+                    corner: 6
                     '''
                     return np.array([[0, 1, 0], [0, 1, 0], [1, 1, 1]])
                 elif self == BlockType.Q:
@@ -212,6 +228,7 @@ class PlayerClient:
                     ■
                     ■
                     ■ ■ ■
+                    corner: 5
                     '''
                     return np.array([[1, 0, 0], [1, 0, 0], [1, 1, 1]])
                 elif self == BlockType.R:
@@ -220,6 +237,7 @@ class PlayerClient:
                     ■ ■
                       ■ ■
                         ■
+                    corner: 7
                     '''
                     return np.array([[1, 1, 0], [0, 1, 1], [0, 0, 1]])
                 elif self == BlockType.S:
@@ -228,6 +246,7 @@ class PlayerClient:
                     ■
                     ■ ■ ■
                         ■
+                    corner: 6
                     '''
                     return np.array([[1, 0, 0], [1, 1, 1], [0, 0, 1]])
                 elif self == BlockType.T:
@@ -236,6 +255,7 @@ class PlayerClient:
                     ■
                     ■ ■ ■
                       ■
+                    corner: 7
                     '''
                     return np.array([[1, 0, 0], [1, 1, 1], [0, 1, 0]])
                 elif self == BlockType.U:
@@ -244,6 +264,7 @@ class PlayerClient:
                       ■
                     ■ ■ ■
                       ■
+                    corner: 8
                     '''
                     return np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
                 elif self == BlockType.X:
@@ -735,10 +756,33 @@ class PlayerClient:
             # 最大値を持つキーのリストを作成する
             return [k for k, v in better_cases_w_size.items() if v == max_value]
 
-
-
         # TODO: 次に置ける角の数を優先
+        def more_corner_piece(better_cases):
+            # 新しいリストを初期化
+            selected_cases = []
+
+            # better_cases内の各要素をチェック
+            for case in better_cases:
+                # もし文字列内に 'U' が含まれていれば、新しいリストに追加
+                if 'U' in case:
+                    selected_cases.append(case)
+
+            # 新しいリストを返す
+            return selected_cases
         def more_corner_piece(better_cases) -> str:
+            selected_cases = [case for case in better_cases if 'U' in case]
+            if len(selected_cases) > 0:
+                return selected_cases
+            selected_cases.extend([case for case in better_cases if 'T' in case or 'R' in case])
+            if len(selected_cases) > 0:
+                return selected_cases
+            selected_cases.extend([case for case in better_cases if 'S' in case or 'P' in case or 'O' in case or 'I' in case or 'L' in case or 'G' in case])
+            if len(selected_cases) > 0:
+                return selected_cases
+            selected_cases.extend([case for case in better_cases if 'Q' in case or 'N' in case or 'M' in case or 'K' in case or 'F' in case or 'D' in case])
+            if len(selected_cases) > 0:
+                return selected_cases
+
             return better_cases
 
         # ヒューリスティックに良い手を選ぶ関数 ==================yet
@@ -755,7 +799,7 @@ class PlayerClient:
             better_cases_3 = big_piece(better_cases_2)
             #print("big piece: ", better_cases_3)
             better_cases_4 = more_corner_piece(better_cases_3)
-
+            #print("more corner: ", better_cases_4)
 
             id = random.randrange(len(better_cases_4))
             # print(tmp[id])
