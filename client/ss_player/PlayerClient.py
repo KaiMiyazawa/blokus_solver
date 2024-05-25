@@ -534,8 +534,25 @@ class PlayerClient:
             return ok_cases, tmp
 
         # ===============================================
-        def nearest_piece(better_cases) -> str:
-            return better_cases
+        # FIXME: 人力でベストらしい選択をしているだけ
+        def nearest_piece(ok_cases) -> str:
+            # if (self.p1turn == 0 and self.player_number == 1):
+            #     print("これは出ない")
+            #     return ['R455']
+            # elif (self.p2turn == 0 and self.player_number == 2):
+            #     return ['R488']
+            # else:
+            #     return ok_cases
+            if (self.p1turn == 0 and self.player_number == 1):
+                node = 'R455'
+            elif (self.p2turn == 0 and self.player_number == 2):
+                node = 'R488'
+            else:
+                return ok_cases
+            if node in ok_cases:
+                return [node]
+            else:
+                return ok_cases
 
         # NOTE: 相手の置ける場所を潰す
         def jamming_piece(board_matrix, ok_cases) -> str:
@@ -666,11 +683,13 @@ class PlayerClient:
                                 if opponent_start_positions[i+p][j+q] == 'z':
                                     z_count += 1
                     better_cases_w_count[cs] = z_count
-                # TODO: better_cases_w_countの中から、キーが少ないものを省きたい
+                # print(better_cases_w_count)
                 max_value = max(better_cases_w_count.values())
 
                 # 最大値を持つキーのリストを作成する
-                return [k for k, v in better_cases_w_count.items() if v == max_value]
+                better_cases = [k for k, v in better_cases_w_count.items() if v == max_value]
+                # print(better_cases)
+                return better_cases
 
             opponent_start_positions = get_opp_positions(board_matrix)
 
@@ -681,7 +700,7 @@ class PlayerClient:
         def big_piece(better_cases) -> str:
             better_cases_w_size = {}
 
-            for cs in ok_cases:
+            for cs in better_cases:
                 # NOTE: pieceを正しい向きで取得する
                 piece = str(cs[0])
                 rf = int(cs[1])
@@ -724,17 +743,23 @@ class PlayerClient:
 
         # ヒューリスティックに良い手を選ぶ関数 ==================yet
         def dicide_hand(board_matrix, ok_cases, tmp) -> str:
-            better_cases = nearest_piece(ok_cases)
+            better_cases_1 = []
+            better_cases_2 = []
+            better_cases_3 = []
+            better_cases_4 = []
 
-            better_cases = jamming_piece(board_matrix, better_cases)
+            better_cases_1 = nearest_piece(ok_cases)
+            #print("nearest: ", better_cases_1)
+            better_cases_2 = jamming_piece(board_matrix, better_cases_1)
+            #print("jamming: ", better_cases_2)
+            better_cases_3 = big_piece(better_cases_2)
+            #print("big piece: ", better_cases_3)
+            better_cases_4 = more_corner_piece(better_cases_3)
 
-            better_cases = big_piece(better_cases)
 
-            better_cases = more_corner_piece(better_cases)
-
-            id = random.randrange(len(better_cases))
+            id = random.randrange(len(better_cases_4))
             # print(tmp[id])
-            return better_cases[id]
+            return better_cases_4[id]
 
 
         # 以下、==========================================
