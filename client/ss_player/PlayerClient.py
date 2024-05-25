@@ -534,13 +534,30 @@ class PlayerClient:
             return ok_cases, tmp
 
         # ===============================================
+        # TODO: 相手の置ける場所を潰す
+        def jamming_piece(board_matrix, ok_cases) -> str:
+            return ok_cases
 
+        # TODO: ピースの大きさを優先する
+        def big_piece(better_cases) -> str:
+            return better_cases
+
+        # TODO: 次に置ける角の数を優先
+        def more_corner_piece(better_cases) -> str:
+            return better_cases
 
         # ヒューリスティックに良い手を選ぶ関数 ==================yet
-        def dicide_hand(ok_cases, tmp) -> str:
-            id = random.randrange(len(ok_cases))
-            print(tmp[id])
-            return ok_cases[id]
+        def dicide_hand(board_matrix, ok_cases, tmp) -> str:
+
+            better_cases = jamming_piece(board_matrix, ok_cases)
+
+            better_cases = big_piece(better_cases)
+
+            better_cases = more_corner_piece(better_cases)
+
+            id = random.randrange(len(better_cases))
+            # print(tmp[id])
+            return better_cases[id]
 
 
         # 以下、==========================================
@@ -579,7 +596,8 @@ class PlayerClient:
                 #相手のピースの位置も見て、その角が有効かどうかの判定もあるとなおよし
             # 選別を経て複数の手が残った場合は、ヤケクソのランダム
         #返り値は、単一の文字列が好ましいと思われる。多分。
-        this_turn_hand = dicide_hand(ok_cases, tmp)
+        # FIXME: board_matrix -> 適切な変数
+        this_turn_hand = dicide_hand(board_matrix, ok_cases, tmp)
         print("this_turn_hand: ", this_turn_hand)
         #if self._player_number == 2:
         #    sys.exit()
