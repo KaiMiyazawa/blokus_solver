@@ -534,7 +534,10 @@ class PlayerClient:
             return ok_cases, tmp
 
         # ===============================================
-        # TODO: 相手の置ける場所を潰す
+        def nearest_piece(better_cases) -> str:
+            return better_cases
+
+        # NOTE: 相手の置ける場所を潰す
         def jamming_piece(board_matrix, ok_cases) -> str:
             # step1 : 相手の置ける場所をマトリックスに表示する -> get_next_gridの応用
             def is_valid_position(matrix, r, c, block, rows, cols):
@@ -674,7 +677,7 @@ class PlayerClient:
             better_cases = better_jammers(opponent_start_positions, ok_cases)
             return better_cases
 
-        # TODO: ピースの大きさを優先する
+        # NOTE: ピースの大きさを優先する
         def big_piece(better_cases) -> str:
             better_cases_w_size = {}
 
@@ -713,14 +716,17 @@ class PlayerClient:
             # 最大値を持つキーのリストを作成する
             return [k for k, v in better_cases_w_size.items() if v == max_value]
 
+
+
         # TODO: 次に置ける角の数を優先
         def more_corner_piece(better_cases) -> str:
             return better_cases
 
         # ヒューリスティックに良い手を選ぶ関数 ==================yet
         def dicide_hand(board_matrix, ok_cases, tmp) -> str:
+            better_cases = nearest_piece(ok_cases)
 
-            better_cases = jamming_piece(board_matrix, ok_cases)
+            better_cases = jamming_piece(board_matrix, better_cases)
 
             better_cases = big_piece(better_cases)
 
