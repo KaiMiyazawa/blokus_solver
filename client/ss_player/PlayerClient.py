@@ -40,10 +40,22 @@ class PlayerClient:
             if action == 'X000':
                 raise SystemExit
 
-	def get_start_grid(matrix, player):
-
+	def __get_start_grid(matrix, player):
+		if player == 1:
+			matrix[4][4] = 'y'
+		else:
+			matrix[9][9] = 'z'
+		return matrix
 
 	def get_next_grid(matrix, player):
+		# 最初の置く位置の指定
+		if (self.p1turn == 0 and player == 1)
+			self.p1turn += 1
+			return (__get_start_grid(matrix, player=1))
+		else if (self.p2turn == 0 and player == 2)
+			self.p2turn += 1
+			return (__get_start_grid(matrix, player=2))
+
 		if player == 1:
 			block = 'o'
 			p = 'y'
