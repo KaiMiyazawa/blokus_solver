@@ -374,18 +374,16 @@ class PlayerClient:
 
                 # ===== ピースの隣接判定 ==========================yet
                 # TODO: 未test
+                # TODO: 未test
                 def is_neighbor(next_grid, piece_map, i, j, a, b) -> bool:
                     for p in range(piece_map.shape[0]):
                         for q in range(piece_map.shape[1]):
                             if piece_map[p][q] == 1:
                                 r = i-a+p
                                 c = j-b+q
-                                if (
-                                    next_grid[r-1][c] != 'o' and next_grid[r-1][c] != 'x' and
-                                    next_grid[r][c+1] != 'o' and next_grid[r][c+1] != 'x' and
-									next_grid[r+1][c] != 'o' and next_grid[r+1][c] != 'x' and
-                                    next_grid[r][c-1] != 'o' and next_grid[r][c-1] != 'x'
-									):
+                                # FIXME: プレイヤーナンバーごとに隣接チェック対象の文字を変える
+                                block = 'o' if self.player_number == 1 else 'x'
+                                if (next_grid[r-1][c] == block and next_grid[r][c+1] == block and next_grid[r+1][c] == block and next_grid[r][c-1] == block):
                                     return True
                 # ===============================================
 
@@ -406,7 +404,6 @@ class PlayerClient:
             # 情報から、手の文字列を生成する関数 =======================yet
             # i, j と、本当に報告すべき座標は異なる。計算が必要。
             def get_ok_string(piece, rf, i, j, a, b) -> str:
-                print(piece + str(rf) + str(i-a) + str(j-b))
                 return (piece + str(rf) + str(i-a) + str(j-b))
 
             # =====================================================
@@ -419,7 +416,6 @@ class PlayerClient:
                     #一つずつマスを見ていく
                     #もし置けるマスであれば、そのマスに対して全ての手を試す
                     if cell == "y" or cell == "z":
-                        print("i, j: ", i, j)
                         for piece in self.my_hands:
                             for rf in range(8): # rotate & flip
                                 piece_map_origin = BlockType(piece)
@@ -440,8 +436,9 @@ class PlayerClient:
                                     for b in range(piece_map.shape[1]):
                                         if piece_map[a][b] == 1:
                                             if is_ok(next_grid, piece_map, i, j, a, b):
-                                                print("ok")
                                                 ok_cases.append(get_ok_string(piece, rf, i, j, a, b))
+                        print("i, j: ", i, j)
+
                             #置けるかどうかの判定
                             #置ける場合は、その手をリストに追加
 
@@ -462,9 +459,14 @@ class PlayerClient:
         # 文字列から2次元配列に変換する
         board_matrix = make_matrix(board)
 
+        #for row in board_matrix:
+        #    print(row)
+
         # 自分が置ける起点となるマスにマークを加えた配列を作成する
         next_grid = get_next_grid(board_matrix, player = self.player_number)
 
+        for row in next_grid:
+            print(row)
         #反則を無視して可能な手を全列挙するフェーズ
         #反則の手を潰すフェーズ
         #ふたつまとめてget_ok_cases
