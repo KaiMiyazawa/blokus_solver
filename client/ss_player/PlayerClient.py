@@ -40,6 +40,9 @@ class PlayerClient:
             if action == 'X000':
                 raise SystemExit
 
+	def get_start_grid(matrix, player):
+
+
 	def get_next_grid(matrix, player):
 		if player == 1:
 			block = 'o'
@@ -86,8 +89,10 @@ class PlayerClient:
 
     def create_action(self, board):
 		# 文字列から2次元配列に変換する
-		board_list = board.split(sep = '\n')
-		board_matrix = [[char for char in string] for string in board_list]
+		# TODO: 滝野boardを受け取り、インデックスを除いた2次元配列を返す
+		board_matrix = make_matrix(board)
+			#board_list = board.split(sep = '\n')
+			#board_matrix = [[char for char in string] for string in board_list]
 
 		# 自分が置ける起点となるマスにマークを加えた配列を作成する
 		next_grid = get_next_grid(board_matrix, player = self.player_number)
