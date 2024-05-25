@@ -537,7 +537,86 @@ class PlayerClient:
         # TODO: 相手の置ける場所を潰す
         def jamming_piece(board_matrix, ok_cases) -> str:
             # step1 : 相手の置ける場所をマトリックスに表示する -> get_next_gridの応用
+            def is_valid_position(matrix, r, c, block, rows, cols):
+                if r < 0 or rows <= r:
+                    return True
+                if c < 0 or cols <= c:
+                    return True
+                if matrix[r][c] != block:
+                    return True
+                return False
+
+            def check_upper_right(matrix, r, c, block, rows, cols):
+                return (is_valid_position(matrix, r-1, c, block, rows, cols) and
+                        is_valid_position(matrix, r, c+1, block, rows, cols) and
+                        is_valid_position(matrix, r-1, c+2, block, rows, cols) and
+                        is_valid_position(matrix, r-2, c+1, block, rows, cols) and
+                        is_valid_position(matrix, r-1, c+1, block, rows, cols))
+
+            def check_lower_right(matrix, r, c, block, rows, cols):
+                return (is_valid_position(matrix, r+1, c, block, rows, cols) and
+                        is_valid_position(matrix, r, c+1, block, rows, cols) and
+                        is_valid_position(matrix, r+1, c+2, block, rows, cols) and
+                        is_valid_position(matrix, r+2, c+1, block, rows, cols) and
+                        is_valid_position(matrix, r+1, c+1, block, rows, cols))
+
+            def check_lower_left(matrix, r, c, block, rows, cols):
+                return (is_valid_position(matrix, r+1, c, block, rows, cols) and
+                        is_valid_position(matrix, r, c-1, block, rows, cols) and
+                        is_valid_position(matrix, r+1, c-2, block, rows, cols) and
+                        is_valid_position(matrix, r+2, c-1, block, rows, cols) and
+                        is_valid_position(matrix, r+1, c-1, block, rows, cols))
+
+            def check_upper_left(matrix, r, c, block, rows, cols):
+                return (is_valid_position(matrix, r-1, c, block, rows, cols) and
+                        is_valid_position(matrix, r, c-1, block, rows, cols) and
+                        is_valid_position(matrix, r-1, c-2, block, rows, cols) and
+                        is_valid_position(matrix, r-2, c-1, block, rows, cols) and
+                    is_valid_position(matrix, r-1, c-1, block, rows, cols))
+
             def get_opp_positions(board_matrix):
+                
+                if self.player_number == 1:
+                    block = 'x'
+                else:
+                    block = 'o'
+
+                p = 'z'
+                rows = len(board_matrix)
+                cols = len(board_matrix[0])
+
+                # 新しい行列を作成
+                new_matrix = [row[:] for row in board_matrix]
+
+                # ブロックの位置を記録するリスト
+                block_positions = []
+
+                # ブロックの位置を探して記録
+                for r in range(rows):
+                    for c in range(cols):
+                        if board_matrix[r][c] == block:
+                            block_positions.append((r, c))
+
+                # 'block' の位置を基に対角線上の位置を 'p' に置き換え
+                for r, c in block_positions:
+                    # 右上の座標 (r-1, c+1)
+                    if r > 0 and c < cols - 1 and check_upper_right(board_matrix, r, c, block, rows, cols):
+                        new_matrix[r-1][c+1] = p
+
+                    # 右下の座標 (r+1, c+1)
+                    if r < rows - 1 and c < cols - 1 and check_lower_right(board_matrix, r, c, block, rows, cols):
+                        new_matrix[r+1][c+1] = p
+
+                    # 左下の座標 (r+1, c-1)
+                    if r < rows - 1 and c > 0 and check_lower_left(board_matrix, r, c, block, rows, cols):
+                        new_matrix[r+1][c-1] = p
+
+                    # 左上の座標 (r-1, c-1)
+                    if r > 0 and c > 0 and check_upper_left(board_matrix, r, c, block, rows, cols):
+                        new_matrix[r-1][c-1] = p
+                for row in new_matrix:
+                    print(row)
+                        
                 return board_matrix
 
             # step2 : ベターな置き方のリストを（それぞれ比較しながら）作る
