@@ -536,12 +536,22 @@ class PlayerClient:
         # ===============================================
         # TODO: 相手の置ける場所を潰す
         def jamming_piece(board_matrix, ok_cases) -> str:
-            #NOTE:
-            #   step1 : 相手の置ける場所をマトリックスに表示する -> get_next_gridの応用
-            #   step2 : ベターな置き方のリストを（それぞれ比較しながら）作る
-            #       a : 置き方一つが何個の置ける場所と重なっているかカウントする
-            #       b : カウントした個数と置き方をリスト化して保存しておく
-            #       c : aを繰り返し、bを更新する
+            # step1 : 相手の置ける場所をマトリックスに表示する -> get_next_gridの応用
+            def get_opp_positions(board_matrix):
+                return board_matrix
+
+            # step2 : ベターな置き方のリストを（それぞれ比較しながら）作る
+            def better_jammers(opponent_start_positions, ok_cases):
+                #   a : 置き方一つが何個の置ける場所と重なっているかカウントする
+                #   b : カウントした個数と置き方をリスト化して保存しておく
+                #   c : aを繰り返し、bを更新する
+                return ok_cases
+
+            opponent_start_positions = get_opp_positions(board_matrix)
+
+            better_cases = better_jammers(opponent_start_positions, ok_cases)
+
+            # return better_cases
             return ok_cases
 
         # TODO: ピースの大きさを優先する
