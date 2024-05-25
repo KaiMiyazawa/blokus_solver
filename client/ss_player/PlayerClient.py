@@ -383,7 +383,7 @@ class PlayerClient:
                                 c = j-b+q
                                 # FIXME: プレイヤーナンバーごとに隣接チェック対象の文字を変える
                                 block = 'o' if self.player_number == 1 else 'x'
-                                if (next_grid[r-1][c] == block and next_grid[r][c+1] == block and next_grid[r+1][c] == block and next_grid[r][c-1] == block):
+                                if (next_grid[r-1][c] == block or next_grid[r][c+1] == block or next_grid[r+1][c] == block or next_grid[r][c-1] == block):
                                     return True
                 # ===============================================
 
