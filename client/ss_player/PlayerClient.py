@@ -24,8 +24,8 @@ class PlayerClient:
 
         # テストケースの手番。
         #ランダムではなく、最初に置くべきマス(5,5) (A,A)を満たした良いテストケース。
-        self.p1Actions = ['U034', 'B037', 'J266', 'M149', 'O763', 'R0A3', 'F0C6', 'K113', 'T021', 'L5D2', 'G251', 'E291', 'D057', 'A053']
-        self.p2Actions = ['A0AA', 'B098', 'N0A5', 'L659', 'K33B', 'J027', 'E2B9', 'C267', 'U07C', 'M3AD', 'O2BB', 'R41C']
+        #self.p1Actions = ['U034', 'B037', 'J266', 'M149', 'O763', 'R0A3', 'F0C6', 'K113', 'T021', 'L5D2', 'G251', 'E291', 'D057', 'A053']
+        #self.p2Actions = ['A0AA', 'B098', 'N0A5', 'L659', 'K33B', 'J027', 'E2B9', 'C267', 'U07C', 'M3AD', 'O2BB', 'R41C']
 
         #お互いが何回打ったかをカウントしている変数。
         #仕様として残す必要もないが、考え方としては重要なので理解しておくべき
@@ -280,59 +280,6 @@ class PlayerClient:
                     raise NotImplementedError
         # ========================================================
 
-        # 次に置けるマスを返す関数 ==========================done
-        def get_next_grid(matrix, player) -> list[list[str]]:
-            new_matrix = matrix
-            ## 最初の置く位置の指定
-            #if (self.p1turn == 0 and player == 1):
-            #    return (__get_start_grid(matrix, player=1))
-            #elif self.p2turn == 0 and player == 2 :
-            #    return (__get_start_grid(matrix, player=2))
-
-            #if player == 1:
-            #    block = 'o'
-            #    p = 'y'
-            #else:
-            #    block = 'x'
-            #    p = 'z'
-
-            #rows = len(matrix)
-            #cols = len(matrix[0])
-
-            ## 新しい行列を作成
-            #new_matrix = [row[:] for row in matrix]
-
-            ## ブロックの位置を記録するリスト
-            #block_positions = []
-
-            ## ブロックの位置を探して記録
-            #for r in range(rows):
-            #    for c in range(cols):
-            #        if matrix[r][c] == block:
-            #            block_positions.append((r, c))
-
-            ## 'block' の位置を基に対角線上の位置を 'p' に置き換え
-            #for r, c in block_positions:
-            #    # 右上の座標 (r-1, c+1)
-            #    if r > 0 and c < cols - 1:
-            #        if matrix[r-1][c] != block and matrix[r][c+1] != block and matrix[r-1][c+2] != block and matrix[r-2][c+1] != block and matrix[r-1][c+1] == '.':
-            #            new_matrix[r-1][c+1] = p
-            #    # 右下の座標 (r+1, c+1)
-            #    if r < rows - 1 and c < cols - 1:
-            #        if matrix[r+1][c] != block and matrix[r][c+1] != block and matrix[r+1][c+2] != block and matrix[r+2][c+1] != block and matrix[r+1][c+1] == '.':
-            #            new_matrix[r+1][c+1] = p
-            #    # 左下の座標 (r+1, c-1)
-            #    if r < rows - 1 and c > 0:
-            #        if matrix[r+1][c] != block and matrix[r][c-1] != block and matrix[r+1][c-2] != block and matrix[r+2][c-1] != block and matrix[r+1][c-1] == '.':
-            #            new_matrix[r+1][c-1] = p
-            #    # 左上の座標 (r-1, c-1)
-            #    if r > 0 and c > 0:
-            #        if matrix[r-1][c] != block and matrix[r][c-1] != block and matrix[r-1][c-2] != block and matrix[r-2][c-1] != block and matrix[r-1][c-1] == '.':
-            #            new_matrix[r-1][c-1] = p
-
-            return new_matrix
-        # ===============================================
-
         # もらった盤面を2次元配列に変換する ==================done
         def make_matrix(board):
             l = 0
@@ -378,7 +325,6 @@ class PlayerClient:
                 # ===============================================
 
                 # ===== ピースの盤面外判定 ========================
-                # TODO: 未test
                 def is_out(next_grid, piece_map, i, j, a, b) -> bool:
                     for p in range(piece_map.shape[0]):
                         for q in range(piece_map.shape[1]):
@@ -388,8 +334,6 @@ class PlayerClient:
                 # ===============================================
 
                 # ===== ピースの隣接判定 ==========================yet
-                # TODO: 未test
-                # TODO: 未test
                 def is_neighbor(next_grid, piece_map, i, j, a, b) -> bool:
                     if self.player_number == 1:
                         block = 'o'
@@ -518,7 +462,6 @@ class PlayerClient:
                     #一つずつマスを見ていく
                     #もし置けるマスであれば、そのマスに対して全ての手を試す
                     if is_corner(i, j) or (self._player_number == 1 and self.p1turn == 0 and i == 4 and j == 4) or (self._player_number == 2 and self.p2turn == 0 and i == 9 and j == 9):
-                        #print("p2.turn, ", self.p2turn, "i, ", i, "j, ", j)
                         for piece in self.my_hands:
                             for rf in range(8): # rotate & flip
                                 piece_map_origin = BlockType(piece)
@@ -533,37 +476,18 @@ class PlayerClient:
                                     piece_map = np.rot90(piece_map, 1).copy()
                                 if rf % 2 == 1:
                                     piece_map = np.fliplr(piece_map)
-                                #print(piece, rf)
-                                #tmp = piece_map_origin.block_map
-                                #for row in tmp:
-                                #    print(row)
-                                #print("=====")
-                                #for row in piece_map:
-                                #    print(row)
-                                #ピースの各マスについて、y or zに重ねて置いた時、反則でないかどうかを判定する。
                                 for a in range(piece_map.shape[0]):
                                     for b in range(piece_map.shape[1]):
                                         if piece_map[a][b] == 1:
                                             if is_ok(next_grid, piece_map, i, j, a, b):
                                                 ok_cases.append(get_ok_string(piece, rf, i, j, a, b))
                                                 tmp.append([get_ok_string(piece, rf, i, j, a, b), piece, rf, i, j, a, b, piece_map])
-                        #print("i, j: ", i, j)
-
-                            #置けるかどうかの判定
-                            #置ける場合は、その手をリストに追加
 
             return ok_cases, tmp
 
         # ===============================================
         # FIXME: 人力でベストらしい選択をしているだけ
         def nearest_piece(ok_cases) -> str:
-            # if (self.p1turn == 0 and self.player_number == 1):
-            #     print("これは出ない")
-            #     return ['R455']
-            # elif (self.p2turn == 0 and self.player_number == 2):
-            #     return ['R488']
-            # else:
-            #     return ok_cases
             if (self.p1turn == 0 and self.player_number == 1):
                 node = 'R455'
             elif (self.p2turn == 0 and self.player_number == 2):
@@ -655,12 +579,9 @@ class PlayerClient:
                     # 左上の座標 (r-1, c-1)
                     if r > 0 and c > 0 and check_upper_left(board_matrix, r, c, block, rows, cols):
                         new_matrix[r-1][c-1] = p
-                #for row in new_matrix:
-                #    print(row)
 
                 return new_matrix
 
-            # step2 : ベターな置き方のリストを（それぞれ比較しながら）作る
             # step2 : ベターな置き方のリストを（それぞれ比較しながら）作る
             def better_jammers(opponent_start_positions, ok_cases):
                 #   a : 置き方一つが何個の置ける場所と重なっているかカウントする
@@ -692,25 +613,17 @@ class PlayerClient:
                     if rf % 2 == 1:
                         piece_map = np.fliplr(piece_map)
 
-                    # def is_out(next_grid, piece_map, i, j, a, b) -> bool:
                     z_count = 0
                     for p in range(piece_map.shape[0]):
                         for q in range(piece_map.shape[1]):
                             if piece_map[p][q] == 1:
-                                if (i + p > 14 or j + q > 14):
-                                    print("cs ", cs)
-                                    print("i, p, i + p\n", i, p, i + p)
-                                    print("j, q, j + q\n", j, q, j + q)
                                 if opponent_start_positions[i+p][j+q] == 'z':
                                     z_count += 1
                     better_cases_w_count[cs] = z_count
-                # print(better_cases_w_count)
                 max_value = max(better_cases_w_count.values())
 
                 # 最大値を持つキーのリストを作成する
-                better_cases = [k for k, v in better_cases_w_count.items() if v == max_value]
-                # print(better_cases)
-                return better_cases
+                return [k for k, v in better_cases_w_count.items() if v == max_value]
 
             opponent_start_positions = get_opp_positions(board_matrix)
 
@@ -793,16 +706,11 @@ class PlayerClient:
             better_cases_4 = []
 
             better_cases_1 = nearest_piece(ok_cases)
-            #print("nearest: ", better_cases_1)
             better_cases_2 = jamming_piece(board_matrix, better_cases_1)
-            #print("jamming: ", better_cases_2)
             better_cases_3 = big_piece(better_cases_2)
-            #print("big piece: ", better_cases_3)
             better_cases_4 = more_corner_piece(better_cases_3)
-            #print("more corner: ", better_cases_4)
 
             id = random.randrange(len(better_cases_4))
-            # print(tmp[id])
             return better_cases_4[id]
 
 
@@ -810,17 +718,8 @@ class PlayerClient:
         # 処理のフロー ====================================
 
         # 文字列から2次元配列に変換する
-        print("player_num", self._player_number)
-        board_matrix = make_matrix(board)
+        next_grid = make_matrix(board)
 
-        #for row in board_matrix:
-        #    print(row)
-
-        # 自分が置ける起点となるマスにマークを加えた配列を作成する
-        next_grid = get_next_grid(board_matrix, player = self._player_number)
-        print("next_grid")
-        for row in next_grid:
-            print(row)
         #反則を無視して可能な手を全列挙するフェーズ
         #反則の手を潰すフェーズ
         #ふたつまとめてget_ok_cases
@@ -840,13 +739,8 @@ class PlayerClient:
             #選ぶピースの大きさが大きいものを優先する
             #次の自分のターンで、置けるようになるマスの多さ　＝　置くピースの角の多さ
                 #相手のピースの位置も見て、その角が有効かどうかの判定もあるとなおよし
-            # 選別を経て複数の手が残った場合は、ヤケクソのランダム
-        #返り値は、単一の文字列が好ましいと思われる。多分。
-        # FIXME: board_matrix -> 適切な変数
-        this_turn_hand = dicide_hand(board_matrix, ok_cases, tmp)
-        print("this_turn_hand: ", this_turn_hand)
-        #if self._player_number == 2:
-        #    sys.exit()
+            # 選別を経て複数の手が残った場合は、ランダム
+        this_turn_hand = dicide_hand(next_grid, ok_cases, tmp)
 
         #選択した手を手札から削除
         self.my_hands.remove(this_turn_hand[0])
@@ -855,33 +749,7 @@ class PlayerClient:
         self.p1turn += 1
         self.p2turn += 1
 
-        #適当です。
-        #readmeのテストが動いて、反則負けできるようにしてあります。
         return this_turn_hand
-
-
-
-
-
-        #以下、もともとのcreate_action内部
-    #def create_action(self, board):
-    #    actions: list[str]
-    #    turn: int
-
-    #    if self.player_number == 1:
-    #        actions = self.p1Actions
-    #        turn = self.p1turn
-    #        self.p1turn += 1
-    #    else:
-    #        actions = self.p2Actions
-    #        turn = self.p2turn
-    #        self.p2turn += 1
-
-    #    if len(actions) > turn:
-    #        return actions[turn]
-    #    else:
-    #        # パスを選択
-    #        return 'X000'
 
     @staticmethod
     async def create(url: str, loop: asyncio.AbstractEventLoop) -> PlayerClient:
