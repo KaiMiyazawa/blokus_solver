@@ -344,7 +344,7 @@ class PlayerClient:
             # 反則判定の関数 ========================================
             # 完全に反則でない手の場合のみ、Trueを返す関数
             # もちろん、反則はFalseを返す。
-            def is_ok(next_grid, piece:str, rf:int, i, j) -> bool:
+            def is_ok(next_grid, piece_map, i, j, a, b) -> bool:
 
                 # ===== ピースの重なり判定=========================
                 # y or z なのは、next_grid[i][j]。
@@ -372,64 +372,40 @@ class PlayerClient:
                                     return True
                 # ===============================================
 
-
                 # ===== ピースの隣接判定 ==========================yet
-                def is_neighbor() -> bool:
-                    pass
+                # TODO: 未test
+                def is_neighbor(next_grid, piece_map, i, j, a, b) -> bool:
+                    for p in range(piece_map.shape[0]):
+                        for q in range(piece_map.shape[1]):
+                            if piece_map[p][q] == 1:
+                                r = i-a+p
+                                c = j-b+q
+                                if (
+                                    next_grid[r-1][c] != 'o' and next_grid[r-1][c] != 'x' and
+                                    next_grid[r][c+1] != 'o' and next_grid[r][c+1] != 'x' and
+									next_grid[r+1][c] != 'o' and next_grid[r+1][c] != 'x' and
+                                    next_grid[r][c-1] != 'o' and next_grid[r][c-1] != 'x'
+									):
+                                    return True
                 # ===============================================
 
-
-                # 以下、この関数のフロー============================
-                #反転、回転を含めた、ピースの形状を獲得
-                piece_map_origin = BlockType(piece)
-                piece_map = piece_map_origin.block_map
-                if rf % 2 == 0:
-                    piece_map = np.flipud(piece_map)
-                if rf == 1 or rf == 2:
-                    pass
-                elif rf == 3 or rf == 4:
-                    piece_map = np.rot90(piece_map, 3)
-                elif rf == 5 or rf == 6:
-                    piece_map = np.rot90(piece_map, 2)
-                elif rf == 7 or rf == 8:
-                    piece_map = np.rot90(piece_map, 1)
-
-                #ピースの各マスについて、y or zに重ねて置いた時、反則でないかどうかを判定する。
-                for a in range(piece_map.shape[0]):
-                    for b in range(piece_map.shape[1]):
-                        if piece_map[a][b] == 1:
-                            # 最初に盤面外判定をしておかないと、他の場面で安心して検証ができない。
-                            # next_grid をインデックスアウトしないようにするために。
-                            if is_out(): #盤面外判定 = 置こうとしているマス ひとつづつについて、盤面外に出ていないかどうか
-                                return False
-                            if is_dup(next_grid, piece_map, i, j, a, b): #重複判定 = すでに置かれているマスと重なるようにおこうとしてしまっているかどうか
-                                # 敵のピースでも自分のピースでも、重なってはいけないべき であることに注意
-                                return False
-                            if is_neighbor(): #隣接判定 = すでに置かれている　”自分の” ピースと隣接してしまっているかどうか
-                                return False
-
-
+                # 最初に盤面外判定をしておかないと、他の場面で安心して検証ができない。
+                # next_grid をインデックスアウトしないようにするために。
+                if is_out(next_grid, piece_map, i, j, a, b): #盤面外判定 = 置こうとしているマス ひとつづつについて、盤面外に出ていないかどうか
+                    return False
+                if is_dup(next_grid, piece_map, i, j, a, b): #重複判定 = すでに置かれているマスと重なるようにおこうとしてしまっているかどうか
+                    # 敵のピースでも自分のピースでも、重なってはいけないべき であることに注意
+                    return False
+                if is_neighbor(next_grid, piece_map, i, j, a, b): #隣接判定 = すでに置かれている　”自分の” ピースと隣接してしまっているかどうか
+                    return False
                 return True
                 # ===============================================
 
             # 情報から、手の文字列を生成する関数 =======================yet
             # i, j と、本当に報告すべき座標は異なる。計算が必要。
-            def get_ok_string(piece:str, rf:int, i, j) -> str:
-                # rf = rotate & flip
-                # i, j = position
-                if i+1 < 10:
-                    I = str(i+1)
-                else:
-                    I = chr(ord("A")+i-9)
-                if j+1 < 10:
-                    J = str(j+1)
-                else:
-                    J = chr(ord("A")+j-9)
-                print("piece: ", piece)
-                print("rf: ", rf)
-                print("i: ", i)
-                print("j: ", j)
-                return (piece + str(rf) + I[0] + J[0])
+            def get_ok_string(piece, rf, i, j, a, b) -> str:
+                print(piece + str(rf) + str(i-a) + str(j-b))
+                return (piece + str(rf) + str(i-a) + str(j-b))
 
             # =====================================================
 
@@ -441,10 +417,29 @@ class PlayerClient:
                     #一つずつマスを見ていく
                     #もし置けるマスであれば、そのマスに対して全ての手を試す
                     if cell == "y" or cell == "z":
+                        print("i, j: ", i, j)
                         for piece in self.my_hands:
                             for rf in range(8): # rotate & flip
-                                if is_ok(next_grid, piece, rf, i, j):
-                                    ok_cases.append(get_ok_string(piece, rf, int(i), int(j)))
+                                piece_map_origin = BlockType(piece)
+                                piece_map = piece_map_origin.block_map
+                                if rf % 2 == 0:
+                                    piece_map = np.flipud(piece_map)
+                                if rf == 1 or rf == 2:
+                                    pass
+                                elif rf == 3 or rf == 4:
+                                    piece_map = np.rot90(piece_map, 3)
+                                elif rf == 5 or rf == 6:
+                                    piece_map = np.rot90(piece_map, 2)
+                                elif rf == 7 or rf == 8:
+                                    piece_map = np.rot90(piece_map, 1)
+
+                                #ピースの各マスについて、y or zに重ねて置いた時、反則でないかどうかを判定する。
+                                for a in range(piece_map.shape[0]):
+                                    for b in range(piece_map.shape[1]):
+                                        if piece_map[a][b] == 1:
+                                            if is_ok(next_grid, piece_map, i, j, a, b):
+                                                print("ok")
+                                                ok_cases.append(get_ok_string(piece, rf, i, j, a, b))
                             #置けるかどうかの判定
                             #置ける場合は、その手をリストに追加
 
