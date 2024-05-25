@@ -267,6 +267,57 @@ class PlayerClient:
                 matrix[9][9] = 'z'
             return matrix
 
+        def is_valid_position(matrix, r, c, rows, cols):
+            return 0 <= r < rows and 0 <= c < cols
+
+        def check_upper_right(matrix, r, c, block, rows, cols):
+            return (is_valid_position(matrix, r-1, c, rows, cols) and
+                    is_valid_position(matrix, r, c+1, rows, cols) and
+                    is_valid_position(matrix, r-1, c+2, rows, cols) and
+                    is_valid_position(matrix, r-2, c+1, rows, cols) and
+                    is_valid_position(matrix, r-1, c+1, rows, cols) and
+                    matrix[r-1][c] != block and
+                    matrix[r][c+1] != block and
+                    matrix[r-1][c+2] != block and
+                    matrix[r-2][c+1] != block and
+                    matrix[r-1][c+1] == '.')
+
+        def check_lower_right(matrix, r, c, block, rows, cols):
+            return (is_valid_position(matrix, r+1, c, rows, cols) and
+                    is_valid_position(matrix, r, c+1, rows, cols) and
+                    is_valid_position(matrix, r+1, c+2, rows, cols) and
+                    is_valid_position(matrix, r+2, c+1, rows, cols) and
+                    is_valid_position(matrix, r+1, c+1, rows, cols) and
+                    matrix[r+1][c] != block and
+                    matrix[r][c+1] != block and
+                    matrix[r+1][c+2] != block and
+                    matrix[r+2][c+1] != block and
+                    matrix[r+1][c+1] == '.')
+
+        def check_lower_left(matrix, r, c, block, rows, cols):
+            return (is_valid_position(matrix, r+1, c, rows, cols) and
+                    is_valid_position(matrix, r, c-1, rows, cols) and
+                    is_valid_position(matrix, r+1, c-2, rows, cols) and
+                    is_valid_position(matrix, r+2, c-1, rows, cols) and
+                    is_valid_position(matrix, r+1, c-1, rows, cols) and
+                    matrix[r+1][c] != block and
+                    matrix[r][c-1] != block and
+                    matrix[r+1][c-2] != block and
+                    matrix[r+2][c-1] != block and
+                    matrix[r+1][c-1] == '.')
+
+        def check_upper_left(matrix, r, c, block, rows, cols):
+            return (is_valid_position(matrix, r-1, c, rows, cols) and
+                    is_valid_position(matrix, r, c-1, rows, cols) and
+                    is_valid_position(matrix, r-1, c-2, rows, cols) and
+                    is_valid_position(matrix, r-2, c-1, rows, cols) and
+                    is_valid_position(matrix, r-1, c-1, rows, cols) and
+                    matrix[r-1][c] != block and
+                    matrix[r][c-1] != block and
+                    matrix[r-1][c-2] != block and
+                    matrix[r-2][c-1] != block and
+                    matrix[r-1][c-1] == '.')
+
         def get_next_grid(matrix, player):
             # 最初の置く位置の指定
             if (self.p1turn == 0 and player == 1):
@@ -299,21 +350,20 @@ class PlayerClient:
             # 'block' の位置を基に対角線上の位置を 'p' に置き換え
             for r, c in block_positions:
                 # 右上の座標 (r-1, c+1)
-                if r > 0 and c < cols - 1:
-                    if matrix[r-1][c] != block and matrix[r][c+1] != block and matrix[r-1][c+2] != block and matrix[r-2][c+1] != block and matrix[r-1][c+1] == '.':
-                        new_matrix[r-1][c+1] = p
+                if r > 0 and c < cols - 1 and check_upper_right(matrix, r, c, block, rows, cols):
+                     new_matrix[r-1][c+1] = p
+
                 # 右下の座標 (r+1, c+1)
-                if r < rows - 1 and c < cols - 1:
-                    if matrix[r+1][c] != block and matrix[r][c+1] != block and matrix[r+1][c+2] != block and matrix[r+2][c+1] != block and matrix[r+1][c+1] == '.':
-                        new_matrix[r+1][c+1] = p
+                if r < rows - 1 and c < cols - 1 and check_lower_right(matrix, r, c, block, rows, cols):
+                     new_matrix[r+1][c+1] = p
+
                 # 左下の座標 (r+1, c-1)
-                if r < rows - 1 and c > 0:
-                    if matrix[r+1][c] != block and matrix[r][c-1] != block and matrix[r+1][c-2] != block and matrix[r+2][c-1] != block and matrix[r+1][c-1] == '.':
-                        new_matrix[r+1][c-1] = p
+                if r < rows - 1 and c > 0 and check_lower_left(matrix, r, c, block, rows, cols):
+                    new_matrix[r+1][c-1] = p
+
                 # 左上の座標 (r-1, c-1)
-                if r > 0 and c > 0:
-                    if matrix[r-1][c] != block and matrix[r][c-1] != block and matrix[r-1][c-2] != block and matrix[r-2][c-1] != block and matrix[r-1][c-1] == '.':
-                        new_matrix[r-1][c-1] = p
+                if r > 0 and c > 0 and check_upper_left(matrix, r, c, block, rows, cols):
+                    new_matrix[r-1][c-1] = p
 
             return new_matrix
         # ===============================================
@@ -390,7 +440,7 @@ class PlayerClient:
                                     return True
                 # ===============================================
 
-		# 以下、この関数のフロー
+        # 以下、この関数のフロー
                 # 最初に盤面外判定をしておかないと、他の場面で安心して検証ができない。
                 # next_grid をインデックスアウトしないようにするために。
                 if is_out(next_grid, piece_map, i, j, a, b): #盤面外判定 = 置こうとしているマス ひとつづつについて、盤面外に出ていないかどうか
