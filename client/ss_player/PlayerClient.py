@@ -259,16 +259,8 @@ class PlayerClient:
                     raise NotImplementedError
         # ========================================================
 
-        # もらった盤面に、次打てるマスを追加して返す関数 ==================done
-        def __get_start_grid(matrix, player):
-            if player == 1:
-                matrix[4][4] = 'y'
-            else:
-                matrix[9][9] = 'z'
-            return matrix
-
-        def get_next_grid(matrix, player):
-
+        # 次に置けるマスを返す関数 ==========================done
+        def get_next_grid(matrix, player) -> list[list[str]]:
             new_matrix = matrix
             ## 最初の置く位置の指定
             #if (self.p1turn == 0 and player == 1):
@@ -392,7 +384,7 @@ class PlayerClient:
                                     return True
                 # ===============================================
 
-		# 以下、この関数のフロー
+        # 以下、この関数のフロー
                 # 最初に盤面外判定をしておかないと、他の場面で安心して検証ができない。
                 # next_grid をインデックスアウトしないようにするために。
                 if is_out(next_grid, piece_map, i, j, a, b): #盤面外判定 = 置こうとしているマス ひとつづつについて、盤面外に出ていないかどうか
