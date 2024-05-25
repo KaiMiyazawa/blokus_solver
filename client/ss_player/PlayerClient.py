@@ -374,8 +374,20 @@ class PlayerClient:
 
 
                 # ===== ピースの隣接判定 ==========================yet
+                # TODO: 未test
                 def is_neighbor() -> bool:
-                    pass
+                    for p in range(piece_map.shape[0]):
+                        for q in range(piece_map.shape[1]):
+                            if piece_map[p][q] == 1:
+                                r = i-a+p
+                                c = j-b+q
+                                if (
+                                    next_grid[r-1][c] != 'o' and next_grid[r-1][c] != 'x' and
+                                    next_grid[r][c+1] != 'o' and next_grid[r][c+1] != 'x' and
+									next_grid[r+1][c] != 'o' and next_grid[r+1][c] != 'x' and
+                                    next_grid[r][c-1] != 'o' and next_grid[r][c-1] != 'x'
+									):
+                                    return True
                 # ===============================================
 
 
@@ -405,7 +417,7 @@ class PlayerClient:
                             if is_dup(next_grid, piece_map, i, j, a, b): #重複判定 = すでに置かれているマスと重なるようにおこうとしてしまっているかどうか
                                 # 敵のピースでも自分のピースでも、重なってはいけないべき であることに注意
                                 return False
-                            if is_neighbor(): #隣接判定 = すでに置かれている　”自分の” ピースと隣接してしまっているかどうか
+                            if is_neighbor(next_grid, piece_map, i, j, a, b): #隣接判定 = すでに置かれている　”自分の” ピースと隣接してしまっているかどうか
                                 return False
 
 
