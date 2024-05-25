@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 
 import random
-
+import sys
 
 class PlayerClient:
     def __init__(self, player_number: int, socket: websockets.WebSocketClientProtocol, loop: asyncio.AbstractEventLoop):
@@ -118,8 +118,8 @@ class PlayerClient:
                 elif self == BlockType.F:
                     '''
                     type F:
-                    ■
-                    ■
+                      ■
+                      ■
                     ■ ■
                     '''
                     return np.array([[0, 1], [0, 1], [1, 1]])
@@ -142,7 +142,7 @@ class PlayerClient:
                     '''
                     type I:
                     ■ ■
-                    ■ ■
+                      ■ ■
                     '''
                     return np.array([[1, 1, 0], [0, 1, 1]])
                 elif self == BlockType.J:
@@ -158,17 +158,17 @@ class PlayerClient:
                 elif self == BlockType.K:
                     '''
                     type K:
-                    ■
-                    ■
-                    ■
+                      ■
+                      ■
+                      ■
                     ■ ■
                     '''
                     return np.array([[0, 1], [0, 1], [0, 1], [1, 1]])
                 elif self == BlockType.L:
                     '''
                     type L:
-                    ■
-                    ■
+                      ■
+                      ■
                     ■ ■
                     ■
                     '''
@@ -176,7 +176,7 @@ class PlayerClient:
                 elif self == BlockType.M:
                     '''
                     type M:
-                    ■
+                      ■
                     ■ ■
                     ■ ■
                     '''
@@ -185,7 +185,7 @@ class PlayerClient:
                     '''
                     type N:
                     ■ ■
-                    ■
+                      ■
                     ■ ■
                     '''
                     return np.array([[1, 1], [0, 1], [1, 1]])
@@ -201,8 +201,8 @@ class PlayerClient:
                 elif self == BlockType.P:
                     '''
                     type P:
-                    ■
-                    ■
+                      ■
+                      ■
                     ■ ■ ■
                     '''
                     return np.array([[0, 1, 0], [0, 1, 0], [1, 1, 1]])
@@ -218,7 +218,7 @@ class PlayerClient:
                     '''
                     type R:
                     ■ ■
-                    ■ ■
+                      ■ ■
                         ■
                     '''
                     return np.array([[1, 1, 0], [0, 1, 1], [0, 0, 1]])
@@ -241,9 +241,9 @@ class PlayerClient:
                 elif self == BlockType.U:
                     '''
                     type U:
-                    ■
+                      ■
                     ■ ■ ■
-                    ■
+                      ■
                     '''
                     return np.array([[0, 1, 0], [1, 1, 1], [0, 1, 0]])
                 elif self == BlockType.X:
@@ -268,52 +268,54 @@ class PlayerClient:
             return matrix
 
         def get_next_grid(matrix, player):
-            # 最初の置く位置の指定
-            if (self.p1turn == 0 and player == 1):
-                return (__get_start_grid(matrix, player=1))
-            elif self.p2turn == 0 and player == 2 :
-                return (__get_start_grid(matrix, player=2))
 
-            if player == 1:
-                block = 'o'
-                p = 'y'
-            else:
-                block = 'x'
-                p = 'z'
+            new_matrix = matrix
+            ## 最初の置く位置の指定
+            #if (self.p1turn == 0 and player == 1):
+            #    return (__get_start_grid(matrix, player=1))
+            #elif self.p2turn == 0 and player == 2 :
+            #    return (__get_start_grid(matrix, player=2))
 
-            rows = len(matrix)
-            cols = len(matrix[0])
+            #if player == 1:
+            #    block = 'o'
+            #    p = 'y'
+            #else:
+            #    block = 'x'
+            #    p = 'z'
 
-            # 新しい行列を作成
-            new_matrix = [row[:] for row in matrix]
+            #rows = len(matrix)
+            #cols = len(matrix[0])
 
-            # ブロックの位置を記録するリスト
-            block_positions = []
+            ## 新しい行列を作成
+            #new_matrix = [row[:] for row in matrix]
 
-            # ブロックの位置を探して記録
-            for r in range(rows):
-                for c in range(cols):
-                    if matrix[r][c] == block:
-                        block_positions.append((r, c))
+            ## ブロックの位置を記録するリスト
+            #block_positions = []
 
-            # 'block' の位置を基に対角線上の位置を 'p' に置き換え
-            for r, c in block_positions:
-                # 右上の座標 (r-1, c+1)
-                if r > 0 and c < cols - 1:
-                    if matrix[r-1][c] != block and matrix[r][c+1] != block and matrix[r-1][c+2] != block and matrix[r-2][c+1] != block and matrix[r-1][c+1] == '.':
-                        new_matrix[r-1][c+1] = p
-                # 右下の座標 (r+1, c+1)
-                if r < rows - 1 and c < cols - 1:
-                    if matrix[r+1][c] != block and matrix[r][c+1] != block and matrix[r+1][c+2] != block and matrix[r+2][c+1] != block and matrix[r+1][c+1] == '.':
-                        new_matrix[r+1][c+1] = p
-                # 左下の座標 (r+1, c-1)
-                if r < rows - 1 and c > 0:
-                    if matrix[r+1][c] != block and matrix[r][c-1] != block and matrix[r+1][c-2] != block and matrix[r+2][c-1] != block and matrix[r+1][c-1] == '.':
-                        new_matrix[r+1][c-1] = p
-                # 左上の座標 (r-1, c-1)
-                if r > 0 and c > 0:
-                    if matrix[r-1][c] != block and matrix[r][c-1] != block and matrix[r-1][c-2] != block and matrix[r-2][c-1] != block and matrix[r-1][c-1] == '.':
-                        new_matrix[r-1][c-1] = p
+            ## ブロックの位置を探して記録
+            #for r in range(rows):
+            #    for c in range(cols):
+            #        if matrix[r][c] == block:
+            #            block_positions.append((r, c))
+
+            ## 'block' の位置を基に対角線上の位置を 'p' に置き換え
+            #for r, c in block_positions:
+            #    # 右上の座標 (r-1, c+1)
+            #    if r > 0 and c < cols - 1:
+            #        if matrix[r-1][c] != block and matrix[r][c+1] != block and matrix[r-1][c+2] != block and matrix[r-2][c+1] != block and matrix[r-1][c+1] == '.':
+            #            new_matrix[r-1][c+1] = p
+            #    # 右下の座標 (r+1, c+1)
+            #    if r < rows - 1 and c < cols - 1:
+            #        if matrix[r+1][c] != block and matrix[r][c+1] != block and matrix[r+1][c+2] != block and matrix[r+2][c+1] != block and matrix[r+1][c+1] == '.':
+            #            new_matrix[r+1][c+1] = p
+            #    # 左下の座標 (r+1, c-1)
+            #    if r < rows - 1 and c > 0:
+            #        if matrix[r+1][c] != block and matrix[r][c-1] != block and matrix[r+1][c-2] != block and matrix[r+2][c-1] != block and matrix[r+1][c-1] == '.':
+            #            new_matrix[r+1][c-1] = p
+            #    # 左上の座標 (r-1, c-1)
+            #    if r > 0 and c > 0:
+            #        if matrix[r-1][c] != block and matrix[r][c-1] != block and matrix[r-1][c-2] != block and matrix[r-2][c-1] != block and matrix[r-1][c-1] == '.':
+            #            new_matrix[r-1][c-1] = p
 
             return new_matrix
         # ===============================================
@@ -385,7 +387,7 @@ class PlayerClient:
                                 if r-1 < 0 or r+1 > 13 or c-1 < 0 or c+1 > 13:
                                     continue
                                 # FIXME: プレイヤーナンバーごとに隣接チェック対象の文字を変える
-                                block = 'o' if self.player_number == 1 else 'x'
+                                block = 'o' if self._player_number == 1 else 'x'
                                 if (next_grid[r-1][c] == block or next_grid[r][c+1] == block or next_grid[r+1][c] == block or next_grid[r][c-1] == block):
                                     return True
                 # ===============================================
@@ -407,24 +409,68 @@ class PlayerClient:
             # 情報から、手の文字列を生成する関数 =======================yet
             # i, j と、本当に報告すべき座標は異なる。計算が必要。
             def get_ok_string(piece, rf, i, j, a, b) -> str:
-                I = j-b+1
-                J = i-a+1
+                I = i-a+1
+                J = j-b+1
                 if I >= 10:
                     I = chr(ord('A') + I - 10)
                 if J >= 10:
                     J = chr(ord('A') + J - 10)
-                return (piece + str(rf) + str(I) + str(J))
+                return (piece + str(rf) + str(J) + str(I))
 
             # =====================================================
 
+            def is_corner(i, j) -> bool:
+                if self._player_number == 1:
+                    block = 'o'
+                else:
+                    block = 'x'
+                if i == 0 and j == 0:
+                    if next_grid[1][1] == block:
+                        return True
+                    return False
+                if i == 0 and j == 13:
+                    if next_grid[1][12] == block:
+                        return True
+                    return False
+                if i == 13 and j == 0:
+                    if next_grid[12][1] == block:
+                        return True
+                    return False
+                if i == 13 and j == 13:
+                    if next_grid[12][12] == block:
+                        return True
+                    return False
+
+                if i == 0:
+                    if next_grid[1][j-1] == block or next_grid[1][j+1] == block:
+                        return True
+                    return False
+                if i == 13:
+                    if next_grid[12][j-1] == block or next_grid[12][j+1] == block:
+                        return True
+                    return False
+                if j == 0:
+                    if next_grid[i-1][1] == block or next_grid[i+1][1] == block:
+                        return True
+                    return False
+                if j == 13:
+                    if next_grid[i-1][12] == block or next_grid[i+1][12] == block:
+                        return True
+                    return False
+
+                if next_grid[i-1][j-1] == block or next_grid[i-1][j+1] == block or next_grid[i+1][j-1] == block or next_grid[i+1][j+1] == block:
+                    return True
+                return False
+
             ok_cases = []
+            tmp = []
 
             for i in range(14):
                 for j in range(14):
                     cell = next_grid[i][j]
                     #一つずつマスを見ていく
                     #もし置けるマスであれば、そのマスに対して全ての手を試す
-                    if cell == "y" or cell == "z":
+                    if is_corner(i, j) or (self._player_number == 1 and self.p1turn == 0 and i == 4 and j == 4) or (self._player_number == 2 and self.p2turn == 0 and i == 9 and j == 9):
                         for piece in self.my_hands:
                             for rf in range(8): # rotate & flip
                                 piece_map_origin = BlockType(piece)
@@ -452,19 +498,21 @@ class PlayerClient:
                                         if piece_map[a][b] == 1:
                                             if is_ok(next_grid, piece_map, i, j, a, b):
                                                 ok_cases.append(get_ok_string(piece, rf, i, j, a, b))
-                        print("i, j: ", i, j)
+                                                tmp.append([get_ok_string(piece, rf, i, j, a, b), piece, rf, i, j, a, b, piece_map])
+                        #print("i, j: ", i, j)
 
                             #置けるかどうかの判定
                             #置ける場合は、その手をリストに追加
 
-            return ok_cases
+            return ok_cases, tmp
 
         # ===============================================
 
 
         # ヒューリスティックに良い手を選ぶ関数 ==================yet
-        def dicide_hand(ok_cases) -> str:
+        def dicide_hand(ok_cases, tmp) -> str:
             id = random.randrange(len(ok_cases))
+            print(tmp[id])
             return ok_cases[id]
 
 
@@ -472,20 +520,21 @@ class PlayerClient:
         # 処理のフロー ====================================
 
         # 文字列から2次元配列に変換する
+        print("player_num", self._player_number)
         board_matrix = make_matrix(board)
 
         #for row in board_matrix:
         #    print(row)
 
         # 自分が置ける起点となるマスにマークを加えた配列を作成する
-        next_grid = get_next_grid(board_matrix, player = self.player_number)
-
+        next_grid = get_next_grid(board_matrix, player = self._player_number)
+        print("next_grid")
         for row in next_grid:
             print(row)
         #反則を無視して可能な手を全列挙するフェーズ
         #反則の手を潰すフェーズ
         #ふたつまとめてget_ok_cases
-        ok_cases = get_ok_cases(next_grid)
+        ok_cases, tmp = get_ok_cases(next_grid)
         # ok_cases == 反則ではない手のリスト
         # ["A000", "A004", ........ "U0DD"] みたいな感じ
 
@@ -503,8 +552,10 @@ class PlayerClient:
                 #相手のピースの位置も見て、その角が有効かどうかの判定もあるとなおよし
             # 選別を経て複数の手が残った場合は、ヤケクソのランダム
         #返り値は、単一の文字列が好ましいと思われる。多分。
-        this_turn_hand = dicide_hand(ok_cases)
+        this_turn_hand = dicide_hand(ok_cases, tmp)
         print("this_turn_hand: ", this_turn_hand)
+        #if self._player_number == 2:
+        #    sys.exit()
 
         #選択した手を手札から削除
         self.my_hands.remove(this_turn_hand[0])
