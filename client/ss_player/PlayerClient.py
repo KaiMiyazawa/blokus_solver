@@ -40,22 +40,57 @@ class PlayerClient:
             if action == 'X000':
                 raise SystemExit
 
+	def get_next_grid(matrix, player):
+		if player == 1:
+			block = 'o'
+			p = 'y'
+		else:
+			block = 'x'
+			p = 'z'
+
+		rows = len(matrix)
+		cols = len(matrix[0])
+
+		# 新しい行列を作成
+		new_matrix = [row[:] for row in matrix]
+
+		# ブロックの位置を記録するリスト
+		block_positions = []
+
+		# ブロックの位置を探して記録
+		for r in range(rows):
+			for c in range(cols):
+				if matrix[r][c] == block:
+					block_positions.append((r, c))
+
+		# 'block' の位置を基に対角線上の位置を 'p' に置き換え
+		for r, c in block_positions:
+			# 右上の座標 (r-1, c+1)
+			if r > 0 and c < cols - 1:
+				if matrix[r-1][c] != block and matrix[r][c+1] != block and matrix[r-1][c+2] != block and matrix[r-2][c+1] != block and matrix[r-1][c+1] == '.':
+					new_matrix[r-1][c+1] = p
+			# 右下の座標 (r+1, c+1)
+			if r < rows - 1 and c < cols - 1:
+				if matrix[r+1][c] != block and matrix[r][c+1] != block and matrix[r+1][c+2] != block and matrix[r+2][c+1] != block and matrix[r+1][c+1] == '.':
+					new_matrix[r+1][c+1] = p
+			# 左下の座標 (r+1, c-1)
+			if r < rows - 1 and c > 0:
+				if matrix[r+1][c] != block and matrix[r][c-1] != block and matrix[r+1][c-2] != block and matrix[r+2][c-1] != block and matrix[r+1][c-1] == '.':
+					new_matrix[r+1][c-1] = p
+			# 左上の座標 (r-1, c-1)
+			if r > 0 and c > 0:
+				if matrix[r-1][c] != block and matrix[r][c-1] != block and matrix[r-1][c-2] != block and matrix[r-2][c-1] != block and matrix[r-1][c-1] == '.':
+					new_matrix[r-1][c-1] = p
+
+		return new_matrix
+
     def create_action(self, board):
+		# 文字列から2次元配列に変換する
+		board_list = board.split(sep = '\n')
+		board_matrix = [[char for char in string] for string in board_list]
 
-        #福原さんと滝野さんに考えて欲しい関数
-        def get_next_grid(board):
-            p_num = self._player_number
-            #置くことができるマスを、何らかの文字で埋める。
-            #(数字とA~Eと.oxの三文字以外が望ましい。空白ももちろんやめて欲しい。)
-
-            #以降を作ってください。
-            next_board = board
-
-            return next_board
-
-
-
-        next_grid = get_next_grid(board)
+		# 自分が置ける起点となるマスにマークを加えた配列を作成する
+		next_grid = get_next_grid(board_matrix, player = self.player_number)
 
         #反則を無視して可能な手を全列挙するフェーズ
         #反則の手を潰すフェーズ
