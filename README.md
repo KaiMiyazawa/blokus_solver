@@ -30,7 +30,8 @@ The specific process is as follows.
 4. and so on ...  
 ---
 ## Result
-We finished second. yeah!💪　　
+We finished second. yeah!💪　　　　
+[news link](https://www.dreamnews.jp/press/0000299920/)
 
 ---
 ## Usage
