@@ -137,4 +137,3 @@ start_blocksduo ss_tarou ss_tarou
 ## 開発チーム
 
 **チーム名**: Penguin
-**開発者**: KaiMiyazawa（Penguin）
